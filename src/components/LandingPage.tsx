@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import logoImage from "figma:asset/2695f03bb56ff627adcb3e6ea5eedf274cba418f.png";
+import logoImage  from '../assets/logo.png';
 
 interface LandingPageProps {
   onGetStarted: () => void;

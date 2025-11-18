@@ -1,7 +1,8 @@
 import { Plus, Upload, FileQuestion, BookOpen, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { MaterialCard } from './MaterialCard';
-import logoImage from 'figma:asset/2695f03bb56ff627adcb3e6ea5eedf274cba418f.png';
+import logoImage from '../assets/logo.png';
+
 
 interface Material {
   id: string;

@@ -1,5 +1,5 @@
 import { MessageSquare, Sparkles, Brain, Target } from 'lucide-react';
-import logoImage from 'figma:asset/2695f03bb56ff627adcb3e6ea5eedf274cba418f.png';
+import logoImage from '../assets/logo.png';
 
 interface EmptyStateProps {
   onSuggestionClick: (text: string) => void;

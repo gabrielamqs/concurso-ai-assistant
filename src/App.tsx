@@ -23,7 +23,8 @@ import {
   PopoverTrigger,
 } from "./components/ui/popover";
 import { Badge } from "./components/ui/badge";
-import logoImage from "figma:asset/2695f03bb56ff627adcb3e6ea5eedf274cba418f.png";
+import logoImage from './assets/logo.png';
+
 
 type ViewType = "landing" | "login" | "dashboard" | "pricing";
 
@@ -251,12 +252,12 @@ export default function App() {
               if (currentView === "dashboard") {
                 setCurrentView("dashboard");
               } else {
-                handleBackToLanding();
+                setCurrentView("dashboard");
               }
             }}
           >
             <Home className="w-4 h-4 mr-2" />
-            {currentView === "dashboard" ? "Dashboard" : "Início"}
+            {currentView === "dashboard" ? "Início" : "Início"}
           </Button>
 
           {/* Contratar Serviço Button - Desktop */}
