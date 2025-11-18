@@ -305,7 +305,7 @@ export default function App() {
             <HelpCircle className="w-5 h-5" />
           </Button>
 
-          {/* Notifications */}
+          {/* Notifications - Desktop & Mobile */}
           <Popover
             open={notificationsOpen}
             onOpenChange={setNotificationsOpen}
@@ -314,7 +314,7 @@ export default function App() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative hidden sm:flex"
+                className="relative"
               >
                 <Bell className="w-5 h-5" />
                 <Badge className="absolute -top-1 -right-1 bg-red-600 text-white px-1.5 py-0 h-5 min-w-5 text-xs">
@@ -322,7 +322,7 @@ export default function App() {
                 </Badge>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0 w-96" align="end">
+            <PopoverContent className="p-0 w-96 max-w-[calc(100vw-2rem)]" align="end">
               <NotificationsPanel
                 onClose={() => setNotificationsOpen(false)}
               />
