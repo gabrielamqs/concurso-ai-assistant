@@ -242,15 +242,21 @@ export default function App() {
 
           <div className="flex-1"></div>
 
-          {/* Back to Landing Button - Desktop */}
+          {/* Back to Dashboard/Landing Button - Desktop */}
           <Button
             variant="ghost"
             size="sm"
             className="hidden sm:flex"
-            onClick={handleBackToLanding}
+            onClick={() => {
+              if (currentView === "dashboard") {
+                setCurrentView("dashboard");
+              } else {
+                handleBackToLanding();
+              }
+            }}
           >
             <Home className="w-4 h-4 mr-2" />
-            Início
+            {currentView === "dashboard" ? "Dashboard" : "Início"}
           </Button>
 
           {/* Contratar Serviço Button - Desktop */}
@@ -269,7 +275,13 @@ export default function App() {
             variant="ghost"
             size="icon"
             className="sm:hidden"
-            onClick={handleBackToLanding}
+            onClick={() => {
+              if (currentView === "dashboard") {
+                setCurrentView("dashboard");
+              } else {
+                handleBackToLanding();
+              }
+            }}
           >
             <Home className="w-5 h-5" />
           </Button>

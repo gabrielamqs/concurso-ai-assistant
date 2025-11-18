@@ -33,6 +33,7 @@ interface StudyPlan {
   completedSubjects: number;
   hoursPerWeek: number;
   daysUntilExam: number;
+  editalId?: string;
 }
 
 const mockEditais: Edital[] = [
@@ -120,7 +121,8 @@ const mockStudyPlans: StudyPlan[] = [
     totalSubjects: 8,
     completedSubjects: 3,
     hoursPerWeek: 20,
-    daysUntilExam: 45
+    daysUntilExam: 45,
+    editalId: '1'
   },
   {
     id: '2',
@@ -131,7 +133,8 @@ const mockStudyPlans: StudyPlan[] = [
     totalSubjects: 12,
     completedSubjects: 4,
     hoursPerWeek: 25,
-    daysUntilExam: 65
+    daysUntilExam: 65,
+    editalId: '2'
   },
   {
     id: '3',
@@ -142,12 +145,14 @@ const mockStudyPlans: StudyPlan[] = [
     totalSubjects: 10,
     completedSubjects: 6,
     hoursPerWeek: 30,
-    daysUntilExam: 50
+    daysUntilExam: 50,
+    editalId: '5'
   }
 ];
 
 export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [studyPlans, setStudyPlans] = useState(mockStudyPlans);
   const [activeFilters, setActiveFilters] = useState<{
     status: string[];
     level: string[];
@@ -165,6 +170,15 @@ export function Dashboard() {
         ? prev[filterType].filter(v => v !== value)
         : [...prev[filterType], value]
     }));
+  };
+
+  const handleDeletePlan = (planId: string) => {
+    setStudyPlans(prev => prev.filter(plan => plan.id !== planId));
+  };
+
+  const handleEditPlan = (planId: string) => {
+    console.log('Edit plan:', planId);
+    // TODO: Implement edit functionality
   };
 
   const filteredEditais = mockEditais.filter(edital => {
@@ -280,12 +294,17 @@ export function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {mockStudyPlans.map(plan => (
-                    <StudyPlanCard key={plan.id} {...plan} />
+                  {studyPlans.map(plan => (
+                    <StudyPlanCard 
+                      key={plan.id} 
+                      {...plan}
+                      onDelete={handleDeletePlan}
+                      onEdit={handleEditPlan}
+                    />
                   ))}
                 </div>
 
-                {mockStudyPlans.length === 0 && (
+                {studyPlans.length === 0 && (
                   <div className="text-center py-12">
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Target className="w-8 h-8 text-gray-400" />
