@@ -22,27 +22,27 @@ const mockNotifications: Notification[] = [
   {
     id: '1',
     type: 'deadline',
-    title: 'Prazo se encerrando!',
-    message: 'Inscrições para TRT 2ª Região encerram em 3 dias',
-    time: 'Há 2 horas',
+    title: 'Edital chegando ao fim!',
+    message: 'As inscrições para Auditor Fiscal - SEFAZ SP encerram em 2 dias (20/12/2024)',
+    time: 'Há 1 hora',
     read: false,
     urgent: true
   },
   {
     id: '2',
     type: 'exam',
-    title: 'Prova se aproximando',
-    message: 'Faltam 45 dias para a prova da Polícia Federal',
-    time: 'Hoje',
+    title: 'Simulado agendado',
+    message: 'Você tem um simulado de Direito Constitucional agendado para amanhã às 14h',
+    time: 'Há 3 horas',
     read: false,
-    urgent: true
+    urgent: false
   },
   {
     id: '3',
     type: 'update',
-    title: 'Novo edital disponível',
-    message: 'INSS - Técnico Administrativo (1000 vagas)',
-    time: 'Ontem',
+    title: 'Edital de interesse aberto',
+    message: 'Novo edital: Analista Judiciário - TRT 2ª Região está com inscrições abertas',
+    time: 'Hoje',
     read: false
   },
   {
