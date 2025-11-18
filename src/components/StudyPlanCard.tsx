@@ -20,9 +20,13 @@ interface StudyPlanProps {
   completedSubjects: number;
   hoursPerWeek: number;
   daysUntilExam: number;
+  editalId?: string;
+  onDelete?: (id: string) => void;
+  onEdit?: (id: string) => void;
 }
 
 export function StudyPlanCard({
+  id,
   title,
   edital,
   examDate,
@@ -30,12 +34,35 @@ export function StudyPlanCard({
   totalSubjects,
   completedSubjects,
   hoursPerWeek,
-  daysUntilExam
+  daysUntilExam,
+  editalId,
+  onDelete,
+  onEdit
 }: StudyPlanProps) {
   const getUrgencyColor = () => {
     if (daysUntilExam <= 30) return 'text-red-600 bg-red-50';
     if (daysUntilExam <= 60) return 'text-orange-600 bg-orange-50';
     return 'text-green-600 bg-green-50';
+  };
+
+  const handleContinueStudying = () => {
+    if (editalId) {
+      window.dispatchEvent(
+        new CustomEvent('openEditalChat', { detail: { editalId } })
+      );
+    }
+  };
+
+  const handleDeletePlan = () => {
+    if (onDelete) {
+      onDelete(id);
+    }
+  };
+
+  const handleEditPlan = () => {
+    if (onEdit) {
+      onEdit(id);
+    }
   };
 
   return (
@@ -52,9 +79,8 @@ export function StudyPlanCard({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Editar Plano</DropdownMenuItem>
-            <DropdownMenuItem>Exportar PDF</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">Excluir</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleEditPlan}>Editar Plano</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDeletePlan} className="text-red-600">Excluir</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -100,7 +126,10 @@ export function StudyPlanCard({
         </Badge>
       </div>
 
-      <Button className="w-full mt-3 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700">
+      <Button 
+        className="w-full mt-3 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+        onClick={handleContinueStudying}
+      >
         Continuar Estudando
       </Button>
     </Card>
