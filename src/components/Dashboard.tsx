@@ -155,15 +155,15 @@ export function Dashboard() {
   const [studyPlans, setStudyPlans] = useState(mockStudyPlans);
   const [activeFilters, setActiveFilters] = useState<{
     status: string[];
-    level: string[];
-    location: string[];
+    state: string[];
+    salary: string[];
   }>({
     status: [],
-    level: [],
-    location: []
+    state: [],
+    salary: []
   });
 
-  const handleFilterChange = (filterType: 'status' | 'level' | 'location', value: string) => {
+  const handleFilterChange = (filterType: 'status' | 'state' | 'salary', value: string) => {
     setActiveFilters(prev => ({
       ...prev,
       [filterType]: prev[filterType].includes(value)
@@ -181,6 +181,42 @@ export function Dashboard() {
     // TODO: Implement edit functionality
   };
 
+  // Função para extrair o estado da localização
+  const extractState = (location: string): string => {
+    if (location.toLowerCase().includes('nacional')) {
+      return 'Nacional';
+    }
+    // Procura por siglas de estados (ex: "SP", "RJ", etc.)
+    const stateMatch = location.match(/\b([A-Z]{2})\b/);
+    return stateMatch ? stateMatch[1] : '';
+  };
+
+  // Função para converter salário string para número
+  const parseSalary = (salaryStr: string): number => {
+    // Remove "R$" e espaços, depois remove pontos (separadores de milhar) e substitui vírgula por ponto
+    const cleaned = salaryStr
+      .replace(/R\$\s*/g, '')
+      .replace(/\./g, '') // Remove pontos (separadores de milhar)
+      .replace(',', '.'); // Substitui vírgula por ponto para parseFloat
+    return parseFloat(cleaned) || 0;
+  };
+
+  // Função para verificar se o salário está na faixa selecionada
+  const matchesSalaryRange = (salaryStr: string, ranges: string[]): boolean => {
+    if (ranges.length === 0) return true;
+    
+    const salary = parseSalary(salaryStr);
+    
+    return ranges.some(range => {
+      if (range === 'Até R$ 5.000') return salary <= 5000;
+      if (range === 'R$ 5.000 - R$ 10.000') return salary > 5000 && salary <= 10000;
+      if (range === 'R$ 10.000 - R$ 15.000') return salary > 10000 && salary <= 15000;
+      if (range === 'R$ 15.000 - R$ 20.000') return salary > 15000 && salary <= 20000;
+      if (range === 'Acima de R$ 20.000') return salary > 20000;
+      return false;
+    });
+  };
+
   const filteredEditais = mockEditais.filter(edital => {
     const matchesSearch = searchQuery === '' || 
       edital.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -190,13 +226,13 @@ export function Dashboard() {
     const matchesStatus = activeFilters.status.length === 0 || 
       activeFilters.status.includes(edital.status);
     
-    const matchesLevel = activeFilters.level.length === 0 || 
-      activeFilters.level.includes(edital.level);
+    const editalState = extractState(edital.location);
+    const matchesState = activeFilters.state.length === 0 || 
+      activeFilters.state.includes(editalState);
     
-    const matchesLocation = activeFilters.location.length === 0 || 
-      activeFilters.location.some(loc => edital.location.includes(loc));
+    const matchesSalary = matchesSalaryRange(edital.salary, activeFilters.salary);
 
-    return matchesSearch && matchesStatus && matchesLevel && matchesLocation;
+    return matchesSearch && matchesStatus && matchesState && matchesSalary;
   });
 
   return (

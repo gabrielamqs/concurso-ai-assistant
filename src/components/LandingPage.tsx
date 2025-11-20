@@ -80,7 +80,7 @@ export function LandingPage({
       title: "Abra com a IA",
       description:
         'Clique em "Abrir com ConcursoAI" e converse sobre o edital.',
-      icon: MessageSquare,
+      icon: MessageSquare,  
     },
     {
       step: "3",
@@ -164,13 +164,6 @@ export function LandingPage({
             >
               Começar Gratuitamente
               <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-lg px-8"
-            >
-              Ver Como Funciona
             </Button>
           </div>
         </div>
