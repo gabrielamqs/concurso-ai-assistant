@@ -53,7 +53,7 @@ export function EditalChatView({ edital, onBack }: EditalChatViewProps) {
   const [editalViewOpen, setEditalViewOpen] = useState(false);
   const [editalSheetOpen, setEditalSheetOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newMaterial, setNewMaterial] = useState({ title: '', type: 'pdf' as const });
+  const [newMaterial, setNewMaterial] = useState<{ title: string; type: 'pdf' | 'text' | 'questoes' }>({ title: '', type: 'pdf' });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
