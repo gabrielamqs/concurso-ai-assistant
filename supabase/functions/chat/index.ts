@@ -1,14 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-// Declaração de tipos para Deno
-declare global {
-  namespace Deno {
-    namespace env {
-      function get(key: string): string | undefined;
-    }
-  }
-}
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",

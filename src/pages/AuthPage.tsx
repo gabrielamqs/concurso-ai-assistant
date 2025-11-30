@@ -100,7 +100,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         id="login-email"
                         type="email"
@@ -116,7 +116,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Senha</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         id="login-password"
                         type="password"
@@ -154,7 +154,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Nome Completo</Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         id="signup-name"
                         type="text"
@@ -170,7 +170,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         id="signup-email"
                         type="email"
@@ -186,7 +186,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Senha</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         id="signup-password"
                         type="password"
