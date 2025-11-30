@@ -14,7 +14,239 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_conversations: {
+        Row: {
+          created_at: string
+          edital_id: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          edital_id?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          edital_id?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_conversations_edital_id_fkey"
+            columns: ["edital_id"]
+            isOneToOne: false
+            referencedRelation: "editais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      editais: {
+        Row: {
+          content: string | null
+          created_at: string
+          exam_date: string | null
+          id: string
+          level: string | null
+          location: string
+          organization: string
+          salary: string | null
+          status: string | null
+          subscription_end: string | null
+          title: string
+          vacancies: number | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          exam_date?: string | null
+          id?: string
+          level?: string | null
+          location: string
+          organization: string
+          salary?: string | null
+          status?: string | null
+          subscription_end?: string | null
+          title: string
+          vacancies?: number | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          exam_date?: string | null
+          id?: string
+          level?: string | null
+          location?: string
+          organization?: string
+          salary?: string | null
+          status?: string | null
+          subscription_end?: string | null
+          title?: string
+          vacancies?: number | null
+        }
+        Relationships: []
+      }
+      materials: {
+        Row: {
+          content: string | null
+          created_at: string
+          edital_id: string | null
+          id: string
+          pages: number | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          edital_id?: string | null
+          id?: string
+          pages?: number | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          edital_id?: string | null
+          id?: string
+          pages?: number | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "materials_edital_id_fkey"
+            columns: ["edital_id"]
+            isOneToOne: false
+            referencedRelation: "editais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      study_plans: {
+        Row: {
+          completed_subjects: number | null
+          created_at: string
+          days_until_exam: number | null
+          edital_id: string
+          exam_date: string | null
+          id: string
+          progress: number | null
+          title: string
+          total_subjects: number | null
+          updated_at: string
+          user_id: string
+          weekly_hours: number | null
+        }
+        Insert: {
+          completed_subjects?: number | null
+          created_at?: string
+          days_until_exam?: number | null
+          edital_id: string
+          exam_date?: string | null
+          id?: string
+          progress?: number | null
+          title: string
+          total_subjects?: number | null
+          updated_at?: string
+          user_id: string
+          weekly_hours?: number | null
+        }
+        Update: {
+          completed_subjects?: number | null
+          created_at?: string
+          days_until_exam?: number | null
+          edital_id?: string
+          exam_date?: string | null
+          id?: string
+          progress?: number | null
+          title?: string
+          total_subjects?: number | null
+          updated_at?: string
+          user_id?: string
+          weekly_hours?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_plans_edital_id_fkey"
+            columns: ["edital_id"]
+            isOneToOne: false
+            referencedRelation: "editais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
