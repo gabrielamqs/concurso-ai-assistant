@@ -7,6 +7,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { toast } from 'sonner';
 import { BookOpen, Mail, Lock, User } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '../components/ui/alert-dialog';
 
 interface AuthPageProps {
   onSuccess: () => void;
@@ -17,6 +27,8 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
   
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
@@ -37,7 +49,13 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
       toast.success('Bem-vindo de volta ao ConcursoAI!');
       onSuccess();
     } catch (error: any) {
-      toast.error(error.message);
+      const friendly =
+        error?.message?.toLowerCase().includes('invalid') ||
+        error?.message?.toLowerCase().includes('credentials')
+          ? 'Credenciais inválidas. Verifique seu e-mail e senha.'
+          : 'Não foi possível fazer login. Tente novamente.';
+      setErrorMessage(friendly);
+      setErrorDialogOpen(true);
     } finally {
       setIsLoading(false);
     }
@@ -73,6 +91,21 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Erro ao entrar</AlertDialogTitle>
+              <AlertDialogDescription>
+                {errorMessage}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => setErrorDialogOpen(false)}>
+                Entendi
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <BookOpen className="w-10 h-10 text-blue-600" />
