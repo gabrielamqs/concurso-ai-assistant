@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { getGeminiService } from '../services/geminiService';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -93,33 +94,132 @@ export function EditalChatView({ edital, onBack }: EditalChatViewProps) {
 
     const userMessage = inputValue.trim();
     setInputValue('');
-    setMessages([...messages, { role: 'user', content: userMessage }]);
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
-    setTimeout(() => {
-      const responses = [
-        `Com base no edital de **${edital.title}**, ${
-          userMessage.toLowerCase().includes('plano') 
-            ? `aqui está uma sugestão de plano de estudos:\n\n**Fase 1 (4 semanas)** - Direito Constitucional\n• Princípios fundamentais (1 semana)\n• Direitos e garantias (2 semanas)\n• Organização do Estado (1 semana)\n\n**Fase 2 (4 semanas)** - Direito Administrativo\n• Princípios (1 semana)\n• Atos administrativos (2 semanas)\n• Licitações (1 semana)\n\n**Fase 3 (2 semanas)** - Português e Raciocínio Lógico\n\nQuer que eu detalhe alguma fase específica?`
-            : userMessage.toLowerCase().includes('questões') || userMessage.toLowerCase().includes('simulado')
-            ? `Vou gerar um simulado personalizado para ${edital.title}:\n\n**Questão 1 (Direito Constitucional):**\nSobre os princípios fundamentais da República Federativa do Brasil, assinale a alternativa correta:\n\na) A soberania é exercida exclusivamente pelo Poder Executivo\nb) A dignidade da pessoa humana é fundamento da República\nc) O pluralismo político não é considerado fundamento\nd) A cidadania não consta na Constituição\n\n**Questão 2 (Direito Administrativo):**\nQuanto aos princípios da Administração Pública...\n\nQuer continuar com mais questões?`
-            : userMessage.toLowerCase().includes('matérias') || userMessage.toLowerCase().includes('disciplinas')
-            ? `Para o edital de **${edital.title}**, as principais disciplinas são:\n\n**Alta Prioridade (caem muito):**\n• Direito Constitucional - 25% da prova\n• Direito Administrativo - 20% da prova\n\n**Média Prioridade:**\n• Português - 15% da prova\n• Raciocínio Lógico - 15% da prova\n\n**Outras disciplinas:**\n• Informática - 10%\n• Legislação Específica - 15%\n\nRecomendo focar 60% do seu tempo nas disciplinas de alta prioridade!`
-            : `Sobre o edital de **${edital.title}**:\n\nO concurso oferece ${edital.vacancies} vagas com remuneração de ${edital.salary}. As inscrições ${edital.status === 'aberto' ? `estão abertas até ${edital.inscriptionDeadline}` : 'ainda serão abertas'}.\n\nÉ um edital para nível ${edital.level} e as provas estão previstas para ${edital.examDate}.\n\nPosso te ajudar a criar um plano de estudos específico para este concurso. Quer que eu faça isso?`
-        }`
-      ];
-      
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: responses[0]
+    try {
+      const geminiService = getGeminiService();
+
+      // Prepara o histórico da conversa (excluindo a mensagem atual)
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      // Chama a API do Gemini
+      const aiResponse = await geminiService.sendMessage(userMessage, edital, conversationHistory);
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: aiResponse
       }]);
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+
+      let errorMessage = 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.';
+
+      if (error instanceof Error) {
+        if (error.message.includes('VITE_GEMINI_API_KEY')) {
+          errorMessage = '⚠️ **Configuração necessária**\n\n' +
+            'Para usar o ConcursoAI, você precisa configurar a chave da API do Google Gemini:\n\n' +
+            '1. Acesse: https://makersuite.google.com/app/apikey\n' +
+            '2. Crie uma chave da API\n' +
+            '3. Copie `.env.local.example` para `.env.local`\n' +
+            '4. Adicione: `VITE_GEMINI_API_KEY=sua_chave_aqui`\n\n' +
+            'Após configurar, recarregue a página.';
+        } else if (error.message.includes('not found')) {
+          errorMessage = '⚠️ **Problema com a API**\n\n' +
+            'A chave da API do Google Gemini não tem acesso aos modelos necessários.\n\n' +
+            'Possíveis soluções:\n' +
+            '1. Verifique se a chave da API está correta\n' +
+            '2. Acesse https://makersuite.google.com/app/apikey e gere uma nova chave\n' +
+            '3. Certifique-se de que a API Gemini está habilitada no Google Cloud Console\n' +
+            '4. Verifique se sua conta tem acesso aos modelos Gemini';
+        } else {
+          errorMessage = `Erro: ${error.message}`;
+        }
+      }
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: errorMessage
+      }]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleSuggestionClick = (text: string) => {
     setInputValue(text);
     textareaRef.current?.focus();
+  };
+
+  const handleQuickAction = async (action: 'plan' | 'questions' | 'materials') => {
+    setIsLoading(true);
+
+    try {
+      const geminiService = getGeminiService();
+
+      let prompt = '';
+      switch (action) {
+        case 'plan':
+          prompt = 'Crie um plano de estudos completo e personalizado para este edital';
+          break;
+        case 'questions':
+          prompt = 'Gere 5 questões de múltipla escolha sobre as principais matérias deste edital';
+          break;
+        case 'materials':
+          prompt = 'Quais são as principais matérias e temas que eu devo estudar para este edital?';
+          break;
+      }
+
+      // Prepara o histórico da conversa
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      // Chama a API do Gemini
+      const aiResponse = await geminiService.sendMessage(prompt, edital, conversationHistory);
+
+      setMessages(prev => [...prev,
+        { role: 'user', content: prompt },
+        { role: 'assistant', content: aiResponse }
+      ]);
+    } catch (error) {
+      console.error('Erro na ação rápida:', error);
+
+      let errorMessage = 'Desculpe, ocorreu um erro ao executar esta ação. Tente novamente.';
+
+      if (error instanceof Error) {
+        if (error.message.includes('VITE_GEMINI_API_KEY')) {
+          errorMessage = '⚠️ **Configuração necessária**\n\n' +
+            'Para usar o ConcursoAI, você precisa configurar a chave da API do Google Gemini:\n\n' +
+            '1. Acesse: https://makersuite.google.com/app/apikey\n' +
+            '2. Crie uma chave da API\n' +
+            '3. Copie `.env.local.example` para `.env.local`\n' +
+            '4. Adicione: `VITE_GEMINI_API_KEY=sua_chave_aqui`\n\n' +
+            'Após configurar, recarregue a página.';
+        } else if (error.message.includes('not found')) {
+          errorMessage = '⚠️ **Problema com a API**\n\n' +
+            'A chave da API do Google Gemini não tem acesso aos modelos necessários.\n\n' +
+            'Possíveis soluções:\n' +
+            '1. Verifique se a chave da API está correta\n' +
+            '2. Acesse https://makersuite.google.com/app/apikey e gere uma nova chave\n' +
+            '3. Certifique-se de que a API Gemini está habilitada no Google Cloud Console\n' +
+            '4. Verifique se sua conta tem acesso aos modelos Gemini';
+        } else {
+          errorMessage = `Erro: ${error.message}`;
+        }
+      }
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: errorMessage
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -219,22 +319,25 @@ export function EditalChatView({ edital, onBack }: EditalChatViewProps) {
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <button
-                        onClick={() => handleSuggestionClick('Crie um plano de estudos para este edital')}
-                        className="p-4 border-2 border-green-200 rounded-xl hover:bg-green-50 hover:border-green-400 transition-all text-left"
+                        onClick={() => handleQuickAction('plan')}
+                        disabled={isLoading}
+                        className="p-4 border-2 border-green-200 rounded-xl hover:bg-green-50 hover:border-green-400 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Target className="w-5 h-5 text-green-600 mb-2" />
                         <p className="text-sm text-gray-700">Criar plano de estudos</p>
                       </button>
                       <button
-                        onClick={() => handleSuggestionClick('Quais são as principais matérias deste edital?')}
-                        className="p-4 border-2 border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-400 transition-all text-left"
+                        onClick={() => handleQuickAction('materials')}
+                        disabled={isLoading}
+                        className="p-4 border-2 border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-400 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <FileText className="w-5 h-5 text-blue-600 mb-2" />
                         <p className="text-sm text-gray-700">Ver matérias principais</p>
                       </button>
                       <button
-                        onClick={() => handleSuggestionClick('Gere questões sobre as matérias deste edital')}
-                        className="p-4 border-2 border-purple-200 rounded-xl hover:bg-purple-50 hover:border-purple-400 transition-all text-left"
+                        onClick={() => handleQuickAction('questions')}
+                        disabled={isLoading}
+                        className="p-4 border-2 border-purple-200 rounded-xl hover:bg-purple-50 hover:border-purple-400 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Sparkles className="w-5 h-5 text-purple-600 mb-2" />
                         <p className="text-sm text-gray-700">Gerar questões</p>
