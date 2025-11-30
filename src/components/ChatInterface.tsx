@@ -4,6 +4,8 @@ import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { ChatMessage } from './ChatMessage';
 import { EmptyState } from './EmptyState';
+import { streamChat } from '../utils/chatStream';
+import { toast } from 'sonner';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -30,22 +32,39 @@ export function ChatInterface() {
     if (!inputValue.trim() || isLoading) return;
 
     const userMessage = inputValue.trim();
+    const userMsg = { role: 'user' as const, content: userMessage };
+    
     setInputValue('');
-    setMessages([...messages, { role: 'user', content: userMessage }]);
+    setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        `Com base nos seus materiais de estudo, posso te ajudar com isso. ${userMessage.includes('resuma') || userMessage.includes('Resuma') ? 'Aqui está um resumo dos principais pontos:\n\n1. Princípios fundamentais da Constituição\n2. Direitos e garantias individuais\n3. Organização do Estado brasileiro\n4. Estrutura dos Poderes\n\nGostaria que eu aprofundasse algum desses tópicos?' : userMessage.includes('questões') || userMessage.includes('Gere') ? 'Vou criar algumas questões baseadas no seu material:\n\n**Questão 1:** Sobre os princípios constitucionais, qual das alternativas está correta?\n\n**Questão 2:** Em relação aos direitos fundamentais, assinale a opção correta.\n\nQuer que eu gere o gabarito comentado?' : userMessage.includes('plano') ? 'Aqui está um plano de estudos sugerido:\n\n**Semana 1-2:** Direito Constitucional (4h/dia)\n**Semana 3-4:** Direito Administrativo (4h/dia)\n**Semana 5-6:** Português e Redação (3h/dia)\n**Diariamente:** Resolução de questões (1h)\n\nPosso ajustar esse plano às suas necessidades!' : 'Vou te explicar esse conceito de forma clara e objetiva, usando exemplos práticos dos seus materiais de estudo. Você gostaria de mais detalhes sobre algum aspecto específico?'}`,
-      ];
-      
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: responses[0]
-      }]);
+    let assistantContent = '';
+    
+    try {
+      await streamChat({
+        messages: [...messages, userMsg],
+        onDelta: (chunk: string) => {
+          assistantContent += chunk;
+          setMessages(prev => {
+            const last = prev[prev.length - 1];
+            if (last?.role === 'assistant') {
+              return prev.map((m, i) => 
+                i === prev.length - 1 ? { ...m, content: assistantContent } : m
+              );
+            }
+            return [...prev, { role: 'assistant', content: assistantContent }];
+          });
+        },
+        onDone: () => {
+          setIsLoading(false);
+        },
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Não foi possível enviar sua mensagem. Tente novamente.');
+      setMessages(prev => prev.slice(0, -1));
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleSuggestionClick = (text: string) => {
